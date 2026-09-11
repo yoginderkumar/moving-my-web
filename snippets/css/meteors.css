@@ -1,0 +1,57 @@
+/*
+  "Meteors" background accent — diagonal streaks periodically falling
+  across a section, seen on Aceternity/Magic UI-style dark hero
+  backgrounds. Pure CSS + a tiny bit of JS to generate N randomized
+  elements; no particle library needed (compare to Sparkles/Vortex in
+  references/effects-catalog.md, which DO justify a dependency).
+
+  Markup (generate N of these, e.g. 15-20, via a simple loop):
+    <div class="meteor-field">
+      <span class="meteor" style="--delay: 0.4s; --left: 22%;"></span>
+      <span class="meteor" style="--delay: 1.8s; --left: 61%;"></span>
+      ...
+    </div>
+
+  JS to generate them:
+    const field = document.querySelector('.meteor-field');
+    for (let i = 0; i < 18; i++) {
+      const meteor = document.createElement('span');
+      meteor.className = 'meteor';
+      meteor.style.setProperty('--delay', `${Math.random() * 6}s`);
+      meteor.style.setProperty('--left', `${Math.random() * 100}%`);
+      field.appendChild(meteor);
+    }
+*/
+
+.meteor-field {
+  position: relative;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.meteor {
+  position: absolute;
+  top: -10%;
+  left: var(--left, 50%);
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, currentColor);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  opacity: 0;
+  animation: meteor-fall 6s linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes meteor-fall {
+  0%   { opacity: 0; transform: rotate(215deg) translateX(0); }
+  5%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; transform: rotate(215deg) translateX(-500px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meteor-field {
+    display: none; /* purely decorative, autoplaying ambient motion — remove entirely rather than freeze mid-streak */
+  }
+}

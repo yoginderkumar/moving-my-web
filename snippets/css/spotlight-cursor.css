@@ -1,0 +1,54 @@
+/*
+  Cursor-tracked "spotlight" glow — the pointer-following radial highlight
+  seen on Aceternity-style card/hero designs. Pure CSS for the visual, a
+  few lines of vanilla JS to feed it pointer coordinates — no particle or
+  shader library needed for this version (see references/effects-catalog.md
+  for when a real dependency like tsparticles actually earns its place).
+
+  Markup:
+    <div class="spotlight-card">
+      <div class="spotlight-card__glow"></div>
+      ...card content...
+    </div>
+
+  JS (attach once per card, or delegate from a shared parent):
+    document.querySelectorAll('.spotlight-card').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--spotlight-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--spotlight-y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+  No prefers-reduced-motion handling needed here: the glow only moves in
+  direct response to the user's own cursor (not autoplaying/decorative
+  motion), which is the category accessibility.md treats as safe to leave
+  as-is. If an entrance animation is added for the glow itself, wrap that
+  separately per accessibility.md.
+*/
+
+@import url("./easing-tokens.css");
+
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; /* keep the glow confined to this card, not bleeding into siblings */
+}
+
+.spotlight-card__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-out-quart);
+  background: radial-gradient(
+    500px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    rgba(255, 255, 255, 0.14),
+    transparent 70%
+  );
+}
+
+.spotlight-card:hover .spotlight-card__glow,
+.spotlight-card:focus-within .spotlight-card__glow {
+  opacity: 1;
+}

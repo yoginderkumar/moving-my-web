@@ -1,6 +1,6 @@
 ---
 name: moving-my-web
-description: Craft award-worthy, production-grade motion for web apps and landing pages — hero entrances, scroll-triggered reveals, stagger/choreography, micro-interactions (hover, magnetic buttons, cursor effects), page/route transitions, and scrollytelling sections, using plain CSS, native scroll-driven CSS, GSAP, or Motion depending on what the moment actually needs. Use this any time the user asks for "animations," "motion," a "landing page that feels premium/award-winning/like an Awwwards site," scroll effects, transitions, micro-interactions, hover effects, parallax, or to make a page "feel alive" — even if they don't name a library. Also use it to review or fix existing animation code for jank, layout thrash, or missing prefers-reduced-motion support.
+description: Craft award-worthy, production-grade motion for web apps and landing pages — hero entrances, scroll-triggered reveals, stagger/choreography, micro-interactions (hover, magnetic buttons, cursor effects, spotlight/tilt/aurora-style effects), page/route transitions, and scrollytelling sections, using plain CSS, native scroll-driven CSS, GSAP, or Motion (formerly Framer Motion) depending on what the moment actually needs. Use this any time the user asks for "animations," "motion," a "landing page that feels premium/award-winning/like an Awwwards site," scroll effects, transitions, micro-interactions, hover effects, parallax, smooth scroll (Lenis), or an "Aceternity/Magic UI-style" effect — even if they don't name a library. Also use it to review or fix existing animation code for jank, layout thrash, or missing prefers-reduced-motion support.
 ---
 
 # World-class web animation
@@ -57,9 +57,11 @@ Build against the approved plan:
 - `references/principles.md` — motion design fundamentals: why animate, easing and timing by animation type, choreography/stagger, visual hierarchy. Read this when the request is about *feel* ("make it feel premium," "it feels stiff/cheap") rather than a specific bug.
 - `references/performance.md` — compositor vs. layout vs. paint properties, `will-change` usage (and misuse), the FLIP technique, how to profile jank in DevTools. Read this when something is janky, or before shipping anything with more than a couple of moving elements.
 - `references/accessibility.md` — `prefers-reduced-motion` patterns, vestibular-safety guidance, focus/ARIA interactions with animated content.
-- `references/decision-framework.md` — the full CSS vs. native-scroll-CSS vs. GSAP vs. Motion decision tree, with concrete triggers for each, plus notes on the View Transitions API for page/route transitions.
+- `references/decision-framework.md` — the full CSS vs. native-scroll-CSS vs. GSAP vs. Motion decision tree, with concrete triggers for each, plus notes on the View Transitions API for page/route transitions, when Lenis smooth-scroll earns its place, and where "premium" actually crosses into needing WebGL.
 - `references/css-patterns.md` — `@keyframes`/transition patterns, native scroll-driven animations (`animation-timeline: view()`/`scroll()`, `animation-range`) with progressive-enhancement fallbacks, and a small custom-easing cheat sheet (avoid the default `ease`/`linear` for anything that should feel deliberate).
 - `references/gsap-patterns.md` — timelines, stagger, ScrollTrigger (pin/scrub/batch), the React cleanup pattern, and `autoAlpha` vs. `opacity`. Note: GSAP (including ScrollTrigger, SplitText, etc.) is fully free as of the Webflow acquisition — no paywalled plugins to work around anymore.
+- `references/motion-patterns.md` — Motion (formerly Framer Motion): variants/stagger, `AnimatePresence`, `layout`/`layoutId` shared-element transitions, scroll-linked hooks (`useScroll`/`useTransform`/`useMotionValue`), the Next.js App Router page-transition gotcha, and built-in reduced-motion support (`MotionConfig`, `useReducedMotion`).
+- `references/effects-catalog.md` — the "Aceternity/Magic UI-style effect" to technique map (spotlight, 3D tilt, meteors, aurora, marquee, vortex, shared-element hover, etc.), tagged by whether it needs nothing but CSS/vanilla JS or a genuine dependency — read this before reaching for a component library to get one effect.
 
 ## Snippet library
 
@@ -72,6 +74,16 @@ Working, copy-adaptable starting points — not a component library to import wh
 - `text-mask-reveal.css` — headline reveal via `clip-path`.
 - `marquee-infinite.css` — seamless infinite-scrolling logo/text strip.
 - `magnetic-hover-button.html` — cursor-following "magnetic" button, the classic premium-landing-page micro-interaction, in vanilla JS + CSS.
+- `spotlight-cursor.css` — pointer-tracked radial-gradient glow (the Aceternity "Spotlight" effect), no dependency.
+- `aurora-background.css` — layered animated gradient background (the "Aurora Background" effect), no dependency.
+- `meteors.css` — diagonal falling-streak background accent, no dependency.
+
+**`snippets/js/`** (vanilla JS, no library):
+- `3d-tilt-card.js` — pointer-tracked 3D card tilt via `perspective`/`rotateX`/`rotateY`, with cleanup and reduced-motion handling.
+
+**`snippets/motion/`** (pull in Motion when the task in `decision-framework.md` calls for it):
+- `shared-layout-transition.jsx` — `layoutId` shared-element ("magic motion") transition from a grid card into an expanded detail view.
+- `scroll-parallax.jsx` — multi-layer scroll-linked parallax via `useScroll`/`useTransform`, reduced-motion aware.
 
 **`snippets/gsap/`** (pull in GSAP when the task in `decision-framework.md` calls for it):
 - `hero-timeline.js` — coordinated multi-element hero entrance (headline, subhead, CTA, art) with stagger.
@@ -79,6 +91,7 @@ Working, copy-adaptable starting points — not a component library to import wh
 - `pinned-scroll-section.js` — pin + scrub pattern for a scrollytelling section.
 - `svg-draw-path.js` — stroke-draw-on-scroll for logos/icons/diagrams.
 - `react-gsap-cleanup.jsx` — `useGSAP` + scoped context pattern that avoids the classic "animation restarts or doubles on re-render" GSAP-in-React bug.
+- `lenis-scrolltrigger-sync.js` — Lenis smooth-scroll synced with ScrollTrigger, with cleanup.
 
 ## A note on taste
 
