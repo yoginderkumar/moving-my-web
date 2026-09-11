@@ -1,0 +1,59 @@
+/*
+  Zero-dependency "aurora" gradient background — soft, shifting color bands
+  behind hero/section content. The library version of this effect (e.g.
+  Aceternity's Aurora Background) ships with no JS dependency either — it's
+  layered repeating-linear-gradients animated via background-position,
+  using mix-blend-mode for the color interplay and mask-image to feather
+  the edges. This is that technique, standalone.
+
+  Markup:
+    <div class="aurora">
+      <div class="aurora__layer"></div>
+      <div class="aurora__content">...actual section content...</div>
+    </div>
+
+  For a genuinely shader-driven, more organic mesh-gradient (the 2025-2026
+  award-site version of this trend), that's a real WebGL case — see
+  references/effects-catalog.md and references/decision-framework.md.
+*/
+
+@import url("./easing-tokens.css");
+
+.aurora {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.aurora__layer {
+  position: absolute;
+  inset: -20%; /* oversize so the animated gradient never shows a hard edge */
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(100deg, #3b82f6 0%, #a855f7 8%, #ec4899 16%, #3b82f6 24%),
+    repeating-linear-gradient(100deg, #60a5fa 0%, #c084fc 10%, transparent 20%, #60a5fa 30%);
+  background-size: 300% 200%, 200% 100%;
+  background-position: 50% 50%, 50% 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  mix-blend-mode: difference; /* the layered-color interplay that reads as "aurora" rather than a flat gradient */
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  animation: aurora-drift 18s var(--ease-in-out-circ) infinite alternate;
+}
+
+.aurora__content {
+  position: relative; /* sit above the aurora layer */
+}
+
+@keyframes aurora-drift {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora__layer {
+    animation: none;
+    background-position: 50% 50%, 50% 50%; /* freeze on a single, still frame */
+  }
+}

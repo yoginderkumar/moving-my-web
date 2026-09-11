@@ -37,6 +37,18 @@ if (prefersReducedMotion) {
 
 GSAP also has a built-in helper for this: `gsap.matchMedia()` lets you register entirely different animation setups per media query condition, including `(prefers-reduced-motion: reduce)`, and cleans up automatically when the condition stops matching.
 
+Motion has even more direct support — see `references/motion-patterns.md`. Wrap the app root once:
+
+```jsx
+<MotionConfig reducedMotion="user">
+  <App />
+</MotionConfig>
+```
+
+`reducedMotion="user"` automatically disables transform- and layout-based animation (including `layout`/`layoutId` shared-element transitions) app-wide for users with the OS preference set, while still letting `opacity`/`color` transitions through so state changes stay visible. This is a real default to reach for, not just a fallback — the manual `useReducedMotion()` hook is for the narrower case of needing a custom (not just "disabled") treatment for a specific animation.
+
+If the project uses Lenis for smooth scroll, it already respects `prefers-reduced-motion` by default (forcing instant, non-eased scroll tracking) — no extra work needed there, just don't pass `respectReducedMotion: false` without a specific reason.
+
 ## What to reduce vs. what to keep
 
 Reduced motion doesn't mean *no* motion — it means removing the motion that's disorienting or purely decorative while keeping the feedback that communicates state:
@@ -51,3 +63,4 @@ Reduced motion doesn't mean *no* motion — it means removing the motion that's 
 - **Purely decorative animated elements should be hidden from assistive tech** (`aria-hidden="true"`) so screen reader users aren't forced to parse motion that carries no information for them.
 - **Animated content that carries meaning needs a non-animated equivalent for anyone not seeing the animation** — e.g., a number counting up should still have the final value present in the DOM/accessible name, not only as an animated visual.
 - **Don't animate away critical content on a timer that the user can't control** (auto-advancing carousels, toasts that disappear before they can be read) — respect `prefers-reduced-motion` for auto-advance timing too, and give a pause/dismiss control where the content matters.
+- **`<canvas>`/WebGL content is invisible to CSS media queries.** A particle background, shader gradient, or three.js scene built for a "premium" feel won't be touched by a `prefers-reduced-motion` media query at all — check `window.matchMedia('(prefers-reduced-motion: reduce)').matches` in JS before initializing the render loop, and provide a static fallback (a still frame, a plain gradient) rather than skipping the check because "it's just a background."

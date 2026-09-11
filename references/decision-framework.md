@@ -16,6 +16,11 @@ The instinct "use CSS for the small stuff, reach for a real library when things 
 | React component enter/exit, shared layout animation between states | Motion (`AnimatePresence`, `layout` prop) — this is the one thing GSAP is genuinely more work for in React |
 | Full page/route transition | View Transitions API natively if the target browsers support it (see below), otherwise Motion `AnimatePresence` (React) or a GSAP-orchestrated exit/enter if outside React |
 | Drag, physics-based gestures (swipe-to-dismiss, draggable cards) | Motion (`drag`, spring physics) or GSAP `Draggable` |
+| Tunable smooth-scroll feel across the whole page | Lenis, layered on top of native scroll (not a replacement for it) — see below |
+| A "recognizable Aceternity/Magic UI effect" (spotlight, tilt, meteors, aurora, etc.) | Usually plain CSS/vanilla JS, not the component library itself — see `references/effects-catalog.md` |
+| Particle field, noise-driven organic background (Vortex/Sparkles-style) | `tsparticles` (particle sim) or `simplex-noise` (organic motion) — see `effects-catalog.md` |
+| 3D scene, shader background, interactive product viewer/globe | three.js / React Three Fiber, or a lighter `ogl`/single-shader approach — only when 3D is genuinely the point, not a stand-in for a CSS gradient (see below) |
+| Complex AE-authored character/icon animation, or state-machine-driven interactive vector art | Lottie (`@lottiefiles/dotlottie-web`) for static AE playback, Rive for interactive state machines |
 
 ## The concrete triggers for reaching past CSS
 
@@ -49,3 +54,19 @@ Both libraries dropped their paywalls for premium plugins (GSAP via the 2024 Web
 - **Motion** is the React-native way to express animation: it reads like the rest of your component code (`variants`, `AnimatePresence`, the `layout` prop for automatic layout animations), and tree-shakes to a small footprint. Pick it for in-app UI animation (modals, lists reordering, page transitions inside a React SPA) where you want animation to live declaratively next to the component logic rather than in an imperative timeline.
 
 It's normal for a single project to use both: Motion for in-app component transitions, GSAP for a marketing/landing page section that needs real choreography.
+
+## Smooth scroll (Lenis) — a layer, not a default
+
+Lenis adds tunable inertia/lerp on top of scrolling without faking it via a `transform`-scrolled wrapper (the older approach, used by pre-v5 Locomotive Scroll), so it doesn't break `position: sticky`, native find-in-page, or scroll-snap the way that older technique did. It respects `prefers-reduced-motion` by default (forces instant scroll tracking rather than eased).
+
+Reach for it when a project specifically wants that heavier, eased scroll feel site-wide, or needs tight frame-by-frame sync between scroll position and a GSAP/WebGL scene (see `snippets/gsap/lenis-scrolltrigger-sync.js` for the ScrollTrigger sync pattern — Lenis moving the page without ScrollTrigger knowing about it is the most common bug). Skip it for an ordinary content site — native scroll is faster to ship, has zero dependency cost, and most users don't actually notice its absence the way they'd notice added scroll lag on a low-end device. Don't add it reflexively just because a reference site has it; ask whether the eased-scroll feel is actually part of the brief.
+
+## When does "premium" actually need WebGL?
+
+A shader-driven mesh-gradient background or a 3D hero scene is a real 2025-2026 award-site pattern, but it's also the single easiest way to blow a landing page's performance and battery budget for a marginal visual gain. Reach for three.js/React Three Fiber (or a lighter single-purpose lib like `ogl` or `tsparticles`) only when at least one of these is true:
+
+1. **The 3D-ness is the actual product** — a configurator, spatial data visualization, an interactive object the user rotates/inspects.
+2. **The visual genuinely can't be approximated in CSS/canvas** — a specific organic shader gradient, a real particle field with physics, a custom generative background that's core to the brand.
+3. The team has (or is budgeting for) the shader/WebGL literacy to build and *maintain* it — a webGL hero nobody on the team can debug six months later is a liability, not a flex.
+
+If none of those hold, a CSS gradient (animated via `background-position` or `@property`-interpolated custom properties), the CSS-only `aurora-background.css` snippet, or a config-driven `tsparticles` background gets 80% of the visual richness at a fraction of the bundle size and zero WebGL maintenance burden. And WebGL/canvas content is **invisible to `prefers-reduced-motion` media queries** — a canvas scene needs its own `matchMedia` check in JS before it starts rendering motion, and needs manual ARIA/fallback content since screen readers get nothing from a `<canvas>` by default.
