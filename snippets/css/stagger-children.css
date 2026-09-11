@@ -1,0 +1,53 @@
+/*
+  Pure-CSS staggered entrance for a list/grid — no JS animation logic
+  needed, just an --i index assigned per item (inline style, a template
+  loop, or an :nth-child selector as shown below).
+*/
+
+@import url("./easing-tokens.css");
+
+@keyframes stagger-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: stagger-rise-in var(--duration-reveal) var(--ease-out-expo) both;
+  /* Falls back to 0 delay if --i was never set, so nothing stays invisible. */
+  animation-delay: calc(var(--i, 0) * var(--stagger-normal));
+}
+
+/* Option A: set --i inline per item where you render the list, e.g.
+   <div class="stagger-item" style="--i: 0">...</div>
+   <div class="stagger-item" style="--i: 1">...</div>  */
+
+/* Option B: no markup changes needed, works for up to ~12 known children */
+.stagger-item:nth-child(1) { --i: 0; }
+.stagger-item:nth-child(2) { --i: 1; }
+.stagger-item:nth-child(3) { --i: 2; }
+.stagger-item:nth-child(4) { --i: 3; }
+.stagger-item:nth-child(5) { --i: 4; }
+.stagger-item:nth-child(6) { --i: 5; }
+.stagger-item:nth-child(7) { --i: 6; }
+.stagger-item:nth-child(8) { --i: 7; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-item {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/*
+  To also trigger this only when the list scrolls into view (rather than
+  on page load), combine with scroll-reveal.css's IntersectionObserver
+  fallback pattern, or wrap the whole list in a .reveal element and let
+  children inherit visibility once the parent's animation-timeline fires.
+*/

@@ -1,0 +1,29 @@
+/*
+  Easing + duration tokens.
+  Define these once per project (e.g. in a global stylesheet or :root) and
+  reference them everywhere instead of hand-writing bezier curves inline —
+  it keeps every animation on the same project's "motion language" and
+  makes it trivial to retune the whole site's feel from one place.
+
+  See references/principles.md for when to use which curve.
+*/
+
+:root {
+  /* Easing */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);      /* general entrances */
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);       /* snappy/premium entrances */
+  --ease-in-quart:  cubic-bezier(0.5, 0, 0.75, 0);       /* general exits */
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);    /* modals, open-then-settle */
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);   /* playful confirmations — use sparingly */
+
+  /* Durations */
+  --duration-micro: 150ms;   /* hover, focus, toggle */
+  --duration-reveal: 450ms;  /* card/section reveal */
+  --duration-hero: 700ms;    /* single element within a hero sequence */
+  --duration-transition: 350ms; /* page/route transition */
+
+  /* Stagger */
+  --stagger-tight: 40ms;
+  --stagger-normal: 70ms;
+  --stagger-loose: 100ms;
+}

@@ -1,0 +1,51 @@
+/*
+  Seamless infinite-scrolling marquee — the logo strip / ticker pattern
+  common in landing-page social-proof sections. Pure CSS, compositor-only
+  (translateX), pauses automatically for reduced-motion users.
+
+  Markup required — duplicate the content ONCE so the loop is seamless:
+
+  <div class="marquee">
+    <div class="marquee__track">
+      <span class="marquee__item">Logo A</span>
+      <span class="marquee__item">Logo B</span>
+      <span class="marquee__item">Logo C</span>
+      <!-- duplicate the whole set again, unchanged, so the loop has no seam -->
+      <span class="marquee__item">Logo A</span>
+      <span class="marquee__item">Logo B</span>
+      <span class="marquee__item">Logo C</span>
+    </div>
+  </div>
+*/
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  gap: 3rem;
+  width: max-content;
+  animation: marquee-scroll 24s linear infinite;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused; /* common UX nicety — lets users read a logo */
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  /* -50% works because the content is duplicated exactly once above */
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track {
+    animation: none;
+  }
+  .marquee {
+    overflow-x: auto; /* let users scroll it manually instead */
+  }
+}

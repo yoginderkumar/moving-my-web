@@ -1,0 +1,50 @@
+/*
+  Headline reveal via clip-path — the "curtain lifting off the text" effect
+  common on premium landing pages. Compositor-cheap (clip-path animates on
+  the compositor in modern browsers) and needs zero JS.
+*/
+
+@import url("./easing-tokens.css");
+
+@keyframes mask-reveal {
+  from {
+    clip-path: inset(0 0 100% 0); /* fully hidden by a mask from the bottom */
+  }
+  to {
+    clip-path: inset(0 0 0% 0); /* fully revealed */
+  }
+}
+
+.mask-reveal {
+  display: inline-block;
+  animation: mask-reveal var(--duration-hero) var(--ease-out-expo) both;
+}
+
+/* For a headline made of multiple lines/words that should reveal in
+   sequence rather than all at once, wrap each piece and stagger: */
+.mask-reveal-line {
+  display: block;
+  overflow: hidden; /* required: clips the child's translateY below */
+}
+.mask-reveal-line > span {
+  display: inline-block;
+  transform: translateY(100%);
+  animation: mask-line-up var(--duration-hero) var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * var(--stagger-loose));
+}
+@keyframes mask-line-up {
+  to { transform: translateY(0); }
+}
+/* Markup:
+   <span class="mask-reveal-line"><span style="--i:0">First line</span></span>
+   <span class="mask-reveal-line"><span style="--i:1">Second line</span></span>
+*/
+
+@media (prefers-reduced-motion: reduce) {
+  .mask-reveal,
+  .mask-reveal-line > span {
+    animation: none;
+    clip-path: none;
+    transform: none;
+  }
+}

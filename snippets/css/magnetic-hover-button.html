@@ -1,0 +1,49 @@
+<!--
+  "Magnetic" button — the cursor-following micro-interaction seen on most
+  award-winning landing pages. Small vanilla JS (no library needed) +
+  compositor-only transform. Respects prefers-reduced-motion by disabling
+  the pointer-tracking effect entirely (keeps a normal hover state).
+
+  Drop this markup + script anywhere; scope the selector if you have more
+  than one magnetic element on a page.
+-->
+<button class="magnetic-btn">
+  <span class="magnetic-btn__label">Get started</span>
+</button>
+
+<style>
+  .magnetic-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.9rem 1.8rem;
+    border-radius: 999px;
+    border: none;
+    background: #111;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform; /* short-lived, constantly-interacted element — acceptable to leave static here */
+  }
+</style>
+
+<script>
+  (function () {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return; // fall back to plain CSS :hover only
+
+    document.querySelectorAll('.magnetic-btn').forEach((btn) => {
+      const strength = 0.35; // 0 = no pull, 1 = cursor-locked. 0.25–0.4 feels "magnetic" without being twitchy.
+
+      btn.addEventListener('pointermove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const relX = e.clientX - (rect.left + rect.width / 2);
+        const relY = e.clientY - (rect.top + rect.height / 2);
+        btn.style.transform = `translate(${relX * strength}px, ${relY * strength}px)`;
+      });
+
+      btn.addEventListener('pointerleave', () => {
+        btn.style.transform = 'translate(0, 0)';
+      });
+    });
+  })();
+</script>

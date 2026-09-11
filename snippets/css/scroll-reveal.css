@@ -1,0 +1,73 @@
+/*
+  Scroll-triggered reveal using native CSS scroll-driven animations
+  (animation-timeline: view()) — no JS, runs on the compositor thread.
+
+  Usage: add class="reveal" to any element you want to fade+rise in as it
+  scrolls into view.
+
+  Browser support: Chromium + Safari today; Firefox is behind a flag as of
+  this writing (~85% global support on caniuse) — see the @supports fallback
+  below and references/decision-framework.md before shipping this as the
+  *only* path on a project that needs to support Firefox users well.
+*/
+
+@import url("./easing-tokens.css");
+
+@keyframes reveal-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fallback state for browsers without support / before JS fallback runs:
+   show content plainly rather than hiding it. Never let content stay
+   invisible with no path to becoming visible. */
+.reveal {
+  opacity: 1;
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    opacity: 0; /* safe to hide now — the animation below guarantees it becomes visible */
+    animation: reveal-rise-in var(--duration-reveal) var(--ease-out-expo) both;
+    animation-timeline: view();
+    /* Starts as soon as the element begins entering the viewport, finishes
+       40% of the way through its full entry→exit journey. Tune this per
+       design — smaller end % = animation resolves earlier/faster. */
+    animation-range: entry 0% cover 40%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal {
+      opacity: 1;
+      animation: none;
+      animation-timeline: none;
+    }
+  }
+}
+
+/*
+  Fallback for browsers WITHOUT animation-timeline support (e.g. Firefox
+  without the flag): pair this CSS with a small IntersectionObserver that
+  adds a class to trigger the same @keyframes via a plain `animation`
+  (no animation-timeline), e.g.:
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal--in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  .reveal--in {
+    animation: reveal-rise-in var(--duration-reveal) var(--ease-out-expo) both;
+  }
+*/
