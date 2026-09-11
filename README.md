@@ -22,12 +22,12 @@ Point Claude at a landing page or app and ask for "animations," "motion," a page
 Clone this repo into your skills directory (or wherever your setup reads local skills from) and Claude will pick it up automatically once the containing folder is on Claude's skill path:
 
 ```bash
-git clone https://github.com/<your-username>/moving-my-web.git
+git clone https://github.com/yoginderkumar/moving-my-web.git
 ```
 
-Consult your client's docs for the exact skills directory — it varies (`~/.claude/skills/`, a project's `.claude/skills/`, or an org-level sync), and the mechanism continues to evolve.
+Consult your client's docs for the exact skills directory. It varies (`~/.claude/skills/`, a project's `.claude/skills/`, or an org-level sync), and the mechanism keeps changing.
 
-**As a plugin marketplace entry:** if you want this installable via `/plugin marketplace add`, wrap it in a plugin manifest per the [plugin docs](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview) — this repo ships the skill itself, not a marketplace wrapper.
+**As a plugin marketplace entry:** if you want this installable via `/plugin marketplace add`, wrap it in a plugin manifest per the [plugin docs](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/overview). This repo ships the skill itself, not a marketplace wrapper.
 
 ## License
 
